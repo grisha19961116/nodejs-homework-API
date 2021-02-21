@@ -10,7 +10,7 @@ const schemaUpdateContact = Joi.object({
   name: Joi.string().alphanum().min(3).max(30).optional().trim(),
   email: Joi.string().email().min(3).max(20).optional(),
   phone: Joi.number().optional(),
-});
+}).min(1);
 const validate = (schema, obj, next) => {
   const { error } = schema.validate(obj);
   if (error) {
