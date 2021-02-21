@@ -42,7 +42,7 @@ const removeContact = async (contactId) => {
   try {
     const allContacts = await fs.readFile(pathContacts);
     const parsedContacts = await JSON.parse(allContacts);
-    const deletedContact = parsedContacts.filter(
+    const deletedContact = await parsedContacts.filter(
       (elem) => elem.id !== contactId
     );
     if (deletedContact.length === parsedContacts.length) {
@@ -55,7 +55,6 @@ const removeContact = async (contactId) => {
     return e;
   }
 };
-
 const updateContact = async (contactId, body) => {
   try {
     const { name, email, phone } = body;
