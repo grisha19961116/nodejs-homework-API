@@ -1,4 +1,4 @@
-const Contact = require("../model/contacts");
+const Contact = require("../model/contact");
 
 const listContacts = async (_req, res, next) => {
   try {
@@ -41,9 +41,9 @@ const getContactById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const { name, email, phone, subscription, password, token } = req.body;
+    const { name, phone } = req.body;
     if (req.body) {
-      const newContact = { name, email, phone, subscription, password, token };
+      const newContact = { name, phone };
       await Contact.add(newContact);
       return res.status(201).json({
         status: "success",
