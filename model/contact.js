@@ -1,12 +1,15 @@
 const Contact = require("./schemas/contact");
 
-const getList = async () => {
+const getList = async (userId) => {
   const allContacts = await Contact.find({});
   return allContacts;
 };
 
-const getById = async (contactId) => {
-  const foundContact = await Contact.findById(contactId);
+const getById = async (id, userId) => {
+  const foundContact = await Contact.findById({
+    _id: id,
+    owner: userId,
+  });
   return foundContact;
 };
 const add = async (newContact) => {
@@ -14,17 +17,18 @@ const add = async (newContact) => {
   return createdContact;
 };
 
-const remove = async (contactId) => {
-  const removedContact = await Contact.findByIdAndRemove(contactId);
+const remove = async (id, userId) => {
+  const removedContact = await Contact.findByIdAndRemove({
+    _id: id,
+    owner: userId,
+  });
   return removedContact;
 };
-const update = async (contactId, body) => {
+const update = async (id, body, userId) => {
   const updatedContact = await Contact.findByIdAndUpdate(
-    contactId,
+    { _id: id, owner: userId },
     { ...body },
-    {
-      new: true,
-    }
+    { new: true }
   );
   return updatedContact;
 };

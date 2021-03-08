@@ -1,8 +1,9 @@
 const Contact = require("../model/contact");
 
-const listContacts = async (_req, res, next) => {
+const listContacts = async (req, res, next) => {
   try {
-    const allContacts = await Contact.getList();
+    const userId = req.user.id;
+    const allContacts = await Contact.getList(userId);
     return res.json({
       status: "success",
       code: 200,
@@ -17,8 +18,11 @@ const listContacts = async (_req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const contactFoundById = await Contact.getById(contactId);
+    const userId = req.user.id;
+    const contactFoundById = await Contact.getById(
+      req.params.contactId,
+      userId
+    );
     if (contactFoundById) {
       return res.json({
         status: "success",
@@ -41,10 +45,10 @@ const getContactById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const { name, phone } = req.body;
-    if (req.body) {
-      const newContact = { name, phone };
-      await Contact.add(newContact);
+    const newContact = req.body;
+    const userId = req.user.id;
+    if (newContact) {
+      await Contact.add({ ...newContact, owner: userId });
       return res.status(201).json({
         status: "success",
         code: 201,
@@ -60,8 +64,8 @@ const addContact = async (req, res, next) => {
 
 const removeContact = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const deletedContact = await Contact.remove(contactId);
+    const userId = req.user.id;
+    const deletedContact = await Contact.remove(req.params.contactId, userId);
     if (deletedContact) {
       return res.json({
         status: "success",
@@ -84,8 +88,8 @@ const removeContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const update = await Contact.update(contactId, req.body);
+    const userId = req.user.id;
+    const update = await Contact.update(req.params.contactId, req.body, userId);
     if (update) {
       return res.json({
         status: "success",

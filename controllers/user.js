@@ -75,8 +75,7 @@ const logout = async (req, res, next) => {
   return res.status(204).json({});
 };
 const getCurrent = async (req, res, next) => {
-  const id = req.user.id;
-  const user = await userSchema.findById(id);
+  const user = req.user;
   if (!user) {
     return res.status(401).json({
       status: "error",

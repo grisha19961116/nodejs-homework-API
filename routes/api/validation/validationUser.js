@@ -1,14 +1,17 @@
 const Joi = require("joi");
 
 const schemaCreateNewUser = Joi.object({
-  name: Joi.string().min(3).max(30).required(),
   email: Joi.string().email().min(3).max(30).required(),
   password: Joi.string().required(),
-}).min(3);
+  subscription: Joi.string().optional(),
+  token: Joi.string().optional(),
+}).min(2);
 
 const schemaLogIn = Joi.object({
   email: Joi.string().email().min(3).max(30).required(),
   password: Joi.string().required(),
+  subscription: Joi.string().optional(),
+  token: Joi.string().optional(),
 }).min(2);
 
 const validate = (schema, obj, next) => {
