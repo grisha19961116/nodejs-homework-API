@@ -32,9 +32,9 @@ const contactSchema = new Schema(
       type: String,
       enum: ["free", "pro", "premium"],
     },
-    token: {
-      type: String,
-    },
+    // token: {
+    //   type: String,
+    // },
     owner: {
       type: SchemaTypes.ObjectId,
       ref: "user",

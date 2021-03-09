@@ -11,7 +11,7 @@ const schemaCreateContact = Joi.object({
     .required(),
   password: Joi.string().required(),
   subscription: Joi.string().optional(),
-  token: Joi.string().optional(),
+  // token: Joi.string().optional(),
 }).min(4);
 
 const schemaUpdateContact = Joi.object({
@@ -25,7 +25,7 @@ const schemaUpdateContact = Joi.object({
     .optional(),
   password: Joi.string().optional(),
   subscription: Joi.string().optional(),
-  token: Joi.string().optional(),
+  // token: Joi.string().optional(),
 }).min(1);
 
 const validate = (schema, obj, next) => {
