@@ -93,10 +93,23 @@ const getCurrent = async (req, res, next) => {
     },
   });
 };
+const updateSubscription = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    console.log(req.body);
+    const update = await UserModel.updateSubscrip(id, req.body);
+    return res.status(200).json({
+      data: update,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 
 module.exports = {
   createNewUser,
   logIn,
   logout,
   getCurrent,
+  updateSubscription,
 };

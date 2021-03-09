@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, model, SchemaTypes } = mongoose;
+const mongoosePaginate = require("mongoose-paginate-v2");
 mongoose.Types.ObjectId.isValid();
 
 const contactSchema = new Schema(
@@ -31,10 +32,12 @@ const contactSchema = new Schema(
     subscription: {
       type: String,
       enum: ["free", "pro", "premium"],
+      required: [true, "Set subscription for current user"],
     },
-    // token: {
-    //   type: String,
-    // },
+    token: {
+      type: String,
+      required: [true, "Set token for current user"],
+    },
     owner: {
       type: SchemaTypes.ObjectId,
       ref: "user",
@@ -43,7 +46,7 @@ const contactSchema = new Schema(
 
   { timestamps: true }
 );
-
+contactSchema.plugin(mongoosePaginate);
 const Contact = model("contact", contactSchema);
 
 module.exports = Contact;
