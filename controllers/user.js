@@ -1,10 +1,61 @@
 const UserModel = require("../model/user");
 const userSchema = require("../model/schemas/user");
+const fs = require("fs").promises;
+const path = require("path");
+const Jimp = require("jimp");
+const { promisify } = require("util");
+const cloudinary = require("cloudinary").v2;
 const jwt = require("jsonwebtoken");
+const createFolderIsExist = require("../helpers/create-directory");
+const User = require("../model/schemas/user");
 require("dotenv").config();
 const SECRET_KEY = process.env.JWT_SECRET;
 
+// cloudinary.config({
+//   cloud_name: process.env.CLOUD_NAME,
+//   api_key: process.env.API_KEY,
+//   api_secret: process.env.API_SECRET,
+// });
+
+// const uploadCloud = promisify(cloudinary.uploader.upload);
+const saveAvatarForStatic = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const DIR_IMAGES = process.env.DIR_IMAGES;
+    const pathToFile = req.file.path;
+    const newNameAvatar = `${Date.now()}-${req.file.originalname}`;
+    const img = await Jimp.read(pathToFile);
+    await img
+      .autocrop()
+      .cover(
+        250,
+        250,
+        Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE
+      )
+      .writeAsync(pathToFile);
+
+    await createFolderIsExist(path.join(DIR_IMAGES, id));
+    await fs.rename(pathToFile, path.join(DIR_IMAGES, id, newNameAvatar));
+    const avatarUrl = `http://localhost:3000/${id}/${newNameAvatar}`;
+    await UserModel.updateAvatar(id, avatarUrl);
+
+    await fs.unlink(path.join(process.cwd(), DIR_IMAGES, req.user.id));
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        avatarUrl,
+      },
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+
 const createNewUser = async (req, res, next) => {
+  //   Используй пакет gravatar для того чтобы при регистрации нового
+  //   пользователя сразу сгенерить ему аватар по его email.
+  // Создай папку tmp в корне проекта и сохраняй в неё созданную аватарку.
   try {
     const { email } = req.body;
     const isExist = await UserModel.findByEmail(email);
@@ -24,6 +75,7 @@ const createNewUser = async (req, res, next) => {
         id: newUser.id,
         email: newUser.email,
         name: newUser.name,
+        avatar: newUser.avatar,
       },
     });
   } catch (e) {
@@ -107,6 +159,7 @@ const updateSubscription = async (req, res, next) => {
 };
 
 module.exports = {
+  saveAvatarForStatic,
   createNewUser,
   logIn,
   logout,

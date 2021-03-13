@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 const bcrypt = require("bcryptjs");
+const gravatar = require("gravatar");
 mongoose.Types.ObjectId.isValid();
 
 const userSchema = new Schema(
@@ -24,6 +25,16 @@ const userSchema = new Schema(
       type: String,
       enum: ["free", "pro", "premium"],
       default: "free",
+    },
+    avatarUrl: {
+      type: String,
+      default: function () {
+        return gravatar.url(this.email, { s: "250" }, true);
+      },
+    },
+    imgIdCloud: {
+      type: String,
+      default: null,
     },
     token: {
       type: String,

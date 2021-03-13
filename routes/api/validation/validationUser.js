@@ -3,15 +3,11 @@ const Joi = require("joi");
 const schemaCreateNewUser = Joi.object({
   email: Joi.string().email().min(3).max(30).required(),
   password: Joi.string().required(),
-  subscription: Joi.string().optional(),
-  token: Joi.string().optional(),
 }).min(2);
 
 const schemaLogIn = Joi.object({
   email: Joi.string().email().min(3).max(30).required(),
   password: Joi.string().required(),
-  subscription: Joi.string().optional(),
-  token: Joi.string().optional(),
 }).min(2);
 
 const validate = (schema, obj, next) => {
@@ -31,4 +27,15 @@ module.exports.registration = (req, _res, next) => {
 };
 module.exports.logIn = (req, _res, next) => {
   return validate(schemaLogIn, req.body, next);
+};
+module.exports.validateUploadAvatar = (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({
+      status: "error",
+      code: 400,
+      data: "Bad request",
+      message: "Field of avatar with file not found",
+    });
+  }
+  next();
 };

@@ -34,10 +34,10 @@ const contactSchema = new Schema(
       enum: ["free", "pro", "premium"],
       required: [true, "Set subscription for current user"],
     },
-    // token: {
-    //   type: String,
-    //   required: [true, "Set token for current user"],
-    // },
+    token: {
+      type: String,
+      default: null,
+    },
     owner: {
       type: SchemaTypes.ObjectId,
       ref: "user",
