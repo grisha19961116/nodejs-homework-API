@@ -4,25 +4,25 @@ const getList = async (
   userId,
   { sortBy, sortByDesc, filter, limit = "5", page = "1", sub }
 ) => {
-  const results = await Contact.paginate(
-    { owner: userId },
-    {
-      limit,
-      page,
-      sort: {
-        ...(sortBy ? { [`${sortBy}`]: 1 } : {}),
-        ...(sortByDesc ? { [`${sortByDesc}`]: -1 } : {}),
-      },
-      select: {
-        ...(filter ? filter.split("|").join(" ") : ""),
-        ...(sub ? filter.split("|").join(" ") : ""),
-      },
-      populate: {
-        path: "owner",
-        select: "email password subscription token -_id",
-      },
-    }
-  );
+  const options = { owner: userId };
+  if (sub) {
+    options.subscription = { $all: [sub] };
+  }
+  const results = await Contact.paginate(options, {
+    limit,
+    page,
+    sort: {
+      ...(sortBy ? { [`${sortBy}`]: 1 } : {}),
+      ...(sortByDesc ? { [`${sortByDesc}`]: -1 } : {}),
+    },
+    select: {
+      ...(filter ? filter.split("|").join(" ") : ""),
+    },
+    populate: {
+      path: "owner",
+      select: "email password subscription token -_id",
+    },
+  });
   const { docs: contacts, totalDocs: total } = results;
   return { total: total.toString(), limit, page, contacts };
 };

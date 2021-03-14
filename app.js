@@ -1,27 +1,18 @@
 const express = require("express");
+const path = require("path");
 const logger = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+const apiLimiter = require("./helpers/apiLimiter");
 
 const contactsRouter = require("./routes/api/contacts");
 const authenticationRoute = require("./routes/api/user");
 const app = express();
 
+const FOLDER_IMAGES = process.env.DIR_IMAGES;
+app.use(express.static(path.join(__dirname, FOLDER_IMAGES)));
+console.log(path.join(__dirname, FOLDER_IMAGES));
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
-
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200,
-  handler: (req, res, next) => {
-    return res.status(400).json({
-      status: "error",
-      code: 400,
-      data: "Bad request",
-      message: "Too many requests, please try again later.",
-    });
-  },
-});
 
 app.use(helmet());
 app.use(logger(formatsLogger));

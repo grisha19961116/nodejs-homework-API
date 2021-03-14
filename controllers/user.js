@@ -1,8 +1,46 @@
 const UserModel = require("../model/user");
 const userSchema = require("../model/schemas/user");
+const fs = require("fs").promises;
+const path = require("path");
+const Jimp = require("jimp");
 const jwt = require("jsonwebtoken");
+const createFolderIsExist = require("../helpers/create-directory");
 require("dotenv").config();
 const SECRET_KEY = process.env.JWT_SECRET;
+
+const saveAvatarForStatic = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const DIR_IMAGES = process.env.DIR_IMAGES;
+    const pathToFile = req.file.path;
+    const newNameAvatar = req.file.originalname;
+
+    const img = await Jimp.read(pathToFile);
+    await img
+      .autocrop()
+      .cover(
+        250,
+        250,
+        Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE
+      )
+      .writeAsync(pathToFile);
+
+    await createFolderIsExist(path.join(DIR_IMAGES, id));
+    await fs.rename(pathToFile, path.join(DIR_IMAGES, id, newNameAvatar));
+    const newUrlAvatar = path.normalize(path.join(id, newNameAvatar));
+    const newUrl = `http://localhost:3000/${id}/${newNameAvatar}`;
+    await UserModel.updateAvatar(id, newUrlAvatar);
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        newUrl,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 
 const createNewUser = async (req, res, next) => {
   try {
@@ -24,6 +62,7 @@ const createNewUser = async (req, res, next) => {
         id: newUser.id,
         email: newUser.email,
         name: newUser.name,
+        avatar: newUser.avatar,
       },
     });
   } catch (e) {
@@ -107,6 +146,7 @@ const updateSubscription = async (req, res, next) => {
 };
 
 module.exports = {
+  saveAvatarForStatic,
   createNewUser,
   logIn,
   logout,
