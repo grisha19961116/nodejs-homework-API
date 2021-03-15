@@ -10,6 +10,6 @@ router
 router
   .get("/:contactId", guard, controllers.getContactById)
   .delete("/:contactId", guard, controllers.removeContact)
-  .patch("/:contactId", guard, validation.update, controllers.updateContact);
+  .put("/:contactId", guard, validation.update, controllers.updateContact);
 
 module.exports = router;

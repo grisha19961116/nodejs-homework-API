@@ -23,7 +23,6 @@ app.use("/api/contacts", apiLimiter, contactsRouter);
 app.use("/api/auth", apiLimiter, authenticationRoute);
 
 app.use((req, res) => {
-  console.log(`ddd`, req);
   res.status(404).json({ message: "Not found" });
 });
 

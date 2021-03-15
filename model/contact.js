@@ -47,12 +47,12 @@ const remove = async (id, userId) => {
   return removedContact;
 };
 const update = async (id, body, userId) => {
-  const updatedContact = await Contact.findByIdAndUpdate(
+  const contact = await Contact.findByIdAndUpdate(
     { _id: id, owner: userId },
     { ...body },
     { new: true }
   );
-  return updatedContact;
+  return contact;
 };
 
 module.exports = {
