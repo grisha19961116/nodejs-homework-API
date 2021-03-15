@@ -1,5 +1,4 @@
 const UserModel = require("../model/user");
-const userSchema = require("../model/schemas/user");
 const fs = require("fs").promises;
 const path = require("path");
 const Jimp = require("jimp");
@@ -101,8 +100,8 @@ const logIn = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   const id = req.user.id;
-  const isExist = await userSchema.findById(id);
-  if (!isExist) {
+  const user = await UserModel.findById(id);
+  if (!user) {
     return res.status(401).json({
       status: "error",
       code: 401,

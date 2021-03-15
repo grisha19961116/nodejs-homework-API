@@ -1,5 +1,6 @@
 const passport = require("passport");
 require("../config/passport");
+const chalk = require("chalk");
 
 const guard = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, (err, user) => {
