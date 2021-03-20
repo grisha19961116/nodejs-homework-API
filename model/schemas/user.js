@@ -6,6 +6,11 @@ mongoose.Types.ObjectId.isValid();
 
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      minlength: 2,
+      default: "Guest",
+    },
     email: {
       type: String,
       required: [true, "Email required"],
@@ -39,6 +44,14 @@ const userSchema = new Schema(
     token: {
       type: String,
       default: null,
+    },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verifyToken: {
+      type: String,
+      require: [true, "Verification token is required"],
     },
   },
   { timestamps: true }

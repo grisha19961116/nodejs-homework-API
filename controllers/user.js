@@ -3,9 +3,12 @@ const fs = require("fs").promises;
 const path = require("path");
 const Jimp = require("jimp");
 const jwt = require("jsonwebtoken");
-const createFolderIsExist = require("../helpers/create-directory");
+const { nanoid } = require("nanoid");
 require("dotenv").config();
 const SECRET_KEY = process.env.JWT_SECRET;
+
+const createFolderIsExist = require("../helpers/create-directory");
+const EmailService = require("../services/emailSendGrid");
 
 const saveAvatarForStatic = async (req, res, next) => {
   try {
@@ -43,7 +46,7 @@ const saveAvatarForStatic = async (req, res, next) => {
 
 const createNewUser = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email, name } = req.body;
     const isExist = await UserModel.findByEmail(email);
     if (isExist) {
       return res.status(409).json({
@@ -53,7 +56,15 @@ const createNewUser = async (req, res, next) => {
         message: "Email has used already!",
       });
     }
-    const newUser = await UserModel.createUser(req.body);
+    const verifyToken = nanoid();
+    const emailService = new EmailService(process.env.NODE_ENV);
+    console.log(process.env.NODE_ENV);
+    await emailService.sendEmail(verifyToken, email, name);
+    const newUser = await UserModel.createUser({
+      ...req.body,
+      verify: false,
+      verifyToken,
+    });
     return res.status(201).json({
       status: "success",
       code: 201,
@@ -68,13 +79,37 @@ const createNewUser = async (req, res, next) => {
     next(e);
   }
 };
+const verify = async (req, res, next) => {
+  try {
+    const token = req.params.token;
+    const user = UserModel.findByVerifyToken(token);
+    if (user) {
+      await UserModel.UpdateVerifyToken(user.id, true, null);
+      return res.json({
+        status: "success",
+        code: 200,
+        message: "Verification was successful!",
+      });
+    } else {
+      return res.json({
+        status: "error",
+        code: 404,
+        data: "Bed request",
+        message: "Link is not valid!",
+      });
+    }
+  } catch (e) {
+    next(e);
+  }
+  return {};
+};
 
 const logIn = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await UserModel.findByEmail(email);
     const isValidPassword = await user.validPassword(password);
-    if (!user || !isValidPassword) {
+    if (!user || !isValidPassword || !user.verify) {
       return res.status(401).json({
         status: "error",
         code: 401,
@@ -84,7 +119,7 @@ const logIn = async (req, res, next) => {
     }
     const id = user._id;
     const payload = { id };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" });
     await UserModel.updateToken(id, token);
     return res.status(200).json({
       status: "success",
@@ -151,4 +186,5 @@ module.exports = {
   logout,
   getCurrent,
   updateSubscription,
+  verify,
 };
