@@ -10,6 +10,7 @@ router
   .post("/login", validation.logIn, controllers.logIn)
   .post("/logout", guard, controllers.logout)
   .patch("/users", guard, controllers.updateSubscription)
+  .get("/users/verify/:verificationToken", controllers.verify)
   .patch(
     "/avatars",
     [guard, upload.single("avatar"), validation.validateUploadAvatar],

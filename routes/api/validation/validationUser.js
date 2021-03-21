@@ -1,11 +1,13 @@
 const Joi = require("joi");
 
 const schemaCreateNewUser = Joi.object({
+  name: Joi.string().min(2).max(30).optional(),
   email: Joi.string().email().min(3).max(30).required(),
   password: Joi.string().required(),
 }).min(2);
 
 const schemaLogIn = Joi.object({
+  name: Joi.string().min(2).max(30).optional(),
   email: Joi.string().email().min(3).max(30).required(),
   password: Joi.string().required(),
 }).min(2);
