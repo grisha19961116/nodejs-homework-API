@@ -39,8 +39,6 @@ const validate = (schema, obj, next) => {
   }
   next();
 };
-// Еще хочу обратить ваше внимание, что передаваемый id, в роутах в 3дз -
-//  тоже надо проверять, через Joi или через mongoose.Types.ObjectId.isValid
 
 module.exports.createContact = (req, _res, next) => {
   return validate(schemaCreateContact, req.body, next);
