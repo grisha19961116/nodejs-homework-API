@@ -1,6 +1,6 @@
-const UserModel = require("../model/user");
-const userSchema = require("../model/schemas/user");
+const UserModel = require("../model/methods/user");
 const jwt = require("jsonwebtoken");
+
 require("dotenv").config();
 const SECRET_KEY = process.env.JWT_SECRET;
 
@@ -46,7 +46,7 @@ const logIn = async (req, res, next) => {
     }
     const id = user._id;
     const payload = { id };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" });
     await UserModel.updateToken(id, token);
     return res.status(200).json({
       status: "success",
@@ -60,46 +60,56 @@ const logIn = async (req, res, next) => {
   }
 };
 
-const logout = async (req, res, next) => {
-  const id = req.user.id;
-  const isExist = await userSchema.findById(id);
-  if (!isExist) {
-    return res.status(401).json({
-      status: "error",
-      code: 401,
-      data: "UNAUTHORIZED",
-      message: "Invalid credentials",
-    });
-  }
-  await UserModel.updateToken(id, null);
-  return res.status(204).json({});
-};
-const getCurrent = async (req, res, next) => {
-  const user = req.user;
-  if (!user) {
-    return res.status(401).json({
-      status: "error",
-      code: 401,
-      data: "UNAUTHORIZED",
-      message: "Invalid credentials",
-    });
-  }
+const logOut = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const isExist = await UserModel.findById(id);
+    if (!isExist) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        data: "UNAUTHORIZED",
+        message: "Invalid credentials",
+      });
+    }
 
-  return res.status(200).json({
-    status: "success",
-    code: 200,
-    data: {
-      user,
-    },
-  });
+    await UserModel.updateToken(id, null);
+    return res.status(204).json({});
+  } catch (e) {
+    next(e);
+  }
 };
+
+const getCurrent = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        data: "UNAUTHORIZED",
+        message: "Invalid credentials",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        user,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const updateSubscription = async (req, res, next) => {
   try {
     const id = req.user.id;
-    console.log(req.body);
-    const update = await UserModel.updateSubscrip(id, req.body);
+    const user = await UserModel.updateSubscription(id, req.body);
     return res.status(200).json({
-      data: update,
+      data: user,
     });
   } catch (e) {
     next(e);
@@ -109,7 +119,7 @@ const updateSubscription = async (req, res, next) => {
 module.exports = {
   createNewUser,
   logIn,
-  logout,
+  logOut,
   getCurrent,
   updateSubscription,
 };

@@ -1,14 +1,14 @@
-const Contact = require("../model/contact");
+const Contact = require("../model/methods/contact");
 
 const listContacts = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-    const allContacts = await Contact.getList(userId, req.query);
+    const id = req.user.id;
+    const contacts = await Contact.getList(id, req.query);
     return res.json({
       status: "success",
       code: 200,
       data: {
-        ...allContacts,
+        ...contacts,
       },
     });
   } catch (e) {
@@ -18,17 +18,16 @@ const listContacts = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   try {
+    const id = req.params.id;
     const userId = req.user.id;
-    const contactFoundById = await Contact.getById(
-      req.params.contactId,
-      userId
-    );
-    if (contactFoundById) {
+
+    const contact = await Contact.getById(id, userId);
+    if (contact) {
       return res.json({
         status: "success",
         code: 200,
         data: {
-          contactFoundById,
+          contact,
         },
       });
     } else {
@@ -45,15 +44,15 @@ const getContactById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   try {
-    const newContact = req.body;
+    const contact = req.body;
     const userId = req.user.id;
-    if (newContact) {
-      await Contact.add({ ...newContact, owner: userId });
+    if (contact) {
+      await Contact.add({ ...contact, owner: userId });
       return res.status(201).json({
         status: "success",
         code: 201,
         data: {
-          newContact,
+          contact,
         },
       });
     }
@@ -64,14 +63,15 @@ const addContact = async (req, res, next) => {
 
 const removeContact = async (req, res, next) => {
   try {
+    const id = req.params.id;
     const userId = req.user.id;
-    const deletedContact = await Contact.remove(req.params.contactId, userId);
-    if (deletedContact) {
+    const contact = await Contact.remove(id, userId);
+    if (contact) {
       return res.json({
         status: "success",
         code: 200,
         data: {
-          deletedContact,
+          contact,
         },
       });
     } else {
@@ -88,14 +88,15 @@ const removeContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   try {
+    const id = req.params.id;
     const userId = req.user.id;
-    const update = await Contact.update(req.params.contactId, req.body, userId);
-    if (update) {
+    const contact = await Contact.update(id, req.body, userId);
+    if (contact) {
       return res.json({
         status: "success",
         code: 200,
         data: {
-          update,
+          contact,
         },
       });
     } else {

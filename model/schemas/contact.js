@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-const { Schema, model, SchemaTypes } = mongoose;
 const mongoosePaginate = require("mongoose-paginate-v2");
+const { Schema, model, SchemaTypes } = mongoose;
+
 mongoose.Types.ObjectId.isValid();
 
 const contactSchema = new Schema(
@@ -9,35 +10,16 @@ const contactSchema = new Schema(
       type: String,
       required: [true, "Set name for contact"],
     },
-    email: {
-      type: String,
-      required: [true, "Email required"],
-      unique: true,
-      min: 4,
-      max: 30,
-      validate(value) {
-        const reg = /\S+@\S+\.\S+/;
-        return reg.test(String(value).toLowerCase());
-      },
-    },
     phone: {
       type: String,
       unique: true,
       required: [true, "Set phone number for current user"],
     },
-    password: {
-      type: String,
-      required: [true, "Set password for current user"],
-    },
     subscription: {
       type: String,
       enum: ["free", "pro", "premium"],
-      required: [true, "Set subscription for current user"],
+      default: "free",
     },
-    // token: {
-    //   type: String,
-    //   required: [true, "Set token for current user"],
-    // },
     owner: {
       type: SchemaTypes.ObjectId,
       ref: "user",
@@ -46,6 +28,7 @@ const contactSchema = new Schema(
 
   { timestamps: true }
 );
+
 contactSchema.plugin(mongoosePaginate);
 const Contact = model("contact", contactSchema);
 

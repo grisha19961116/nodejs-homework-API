@@ -1,10 +1,15 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 const bcrypt = require("bcryptjs");
+
 mongoose.Types.ObjectId.isValid();
 
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      required: [true, "Set name for contact"],
+    },
     email: {
       type: String,
       required: [true, "Email required"],
@@ -20,11 +25,6 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Set password for current user"],
     },
-    subscription: {
-      type: String,
-      enum: ["free", "pro", "premium"],
-      default: "free",
-    },
     token: {
       type: String,
       default: null,
@@ -34,9 +34,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
+  if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(8);
   this.password = await bcrypt.hash(this.password, salt, null);
   next();

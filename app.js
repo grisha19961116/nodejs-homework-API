@@ -4,8 +4,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
-const contactsRouter = require("./routes/api/contacts");
-const authenticationRoute = require("./routes/api/user");
+const contactsRouter = require("./routes/contacts");
+const authenticationRoute = require("./routes/user");
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
@@ -36,7 +36,7 @@ app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
   res.status(500).json({ message: err.message });
 });
 
