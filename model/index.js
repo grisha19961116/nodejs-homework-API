@@ -1,85 +1,73 @@
 const fs = require("fs/promises");
 const path = require("path");
-const pathContacts = path.join(__dirname, "contacts.json");
+const dbFolder = path.join(process.cwd(), "db", "contacts.json");
 
 const listContacts = async () => {
   try {
-    const allContacts = await fs.readFile(pathContacts);
-    const parsedContacts = await JSON.parse(allContacts);
-    return parsedContacts;
+    const data = await fs.readFile(dbFolder);
+    const parsed = await JSON.parse(data);
+    return parsed;
   } catch (e) {
     return e;
   }
 };
 
-const getContactById = async (contactId) => {
+const getContactById = async (id) => {
   try {
-    const allContacts = await fs.readFile(pathContacts);
-    const parsedContacts = await JSON.parse(allContacts);
-    const findContact = await parsedContacts.find((el) => el.id === contactId);
-    if (!findContact) {
-      return null;
-    } else {
-      return findContact;
-    }
+    const data = await fs.readFile(dbFolder);
+    const parsed = await JSON.parse(data);
+    const contact = await parsed.find((el) => el.id === id);
+    if (!contact) return null;
+    return contact;
   } catch (e) {
     return e;
   }
 };
-const addContact = async (newContact) => {
+const addContact = async (contact) => {
   try {
-    const allContacts = await fs.readFile(pathContacts);
-    const parsedContacts = await JSON.parse(allContacts);
-    const addNewContact = [...parsedContacts, newContact];
-    const contactsString = await JSON.stringify(addNewContact, null, 2);
-    await fs.writeFile(pathContacts, contactsString);
+    const data = await fs.readFile(dbFolder);
+    const parsed = await JSON.parse(data);
+    const contacts = [...parsed, contact];
+    const json = await JSON.stringify(contacts, null, 2);
+    await fs.writeFile(dbFolder, json);
   } catch (e) {
     return e;
   }
 };
 
-const removeContact = async (contactId) => {
+const removeContact = async (id) => {
   try {
-    const allContacts = await fs.readFile(pathContacts);
-    const parsedContacts = await JSON.parse(allContacts);
-    const deletedContact = await parsedContacts.filter(
-      (elem) => elem.id !== contactId
-    );
-    if (deletedContact.length === parsedContacts.length) {
-      return false;
-    }
-    const contactsString = await JSON.stringify(deletedContact, null, 2);
-    await fs.writeFile(pathContacts, contactsString);
+    const data = await fs.readFile(dbFolder);
+    const parsed = await JSON.parse(data);
+    const contacts = await parsed.filter((elem) => elem.id !== id);
+    if (contacts.length === parsed.length) return false;
+
+    const json = await JSON.stringify(contacts, null, 2);
+    await fs.writeFile(dbFolder, json);
     return true;
   } catch (e) {
     return e;
   }
 };
-const updateContact = async (contactId, body) => {
+const updateContact = async (id, body) => {
   try {
     const { name, email, phone } = body;
-    const allContacts = await fs.readFile(pathContacts);
-    const parsedContacts = await JSON.parse(allContacts);
-    let findContact;
-    const updatedContacts = await parsedContacts.map((elem) => {
-      if (elem.id === contactId) {
-        findContact = elem;
-        if (name) {
-          findContact.name = name;
-        }
-        if (email) {
-          findContact.email = email;
-        }
-        if (phone) {
-          findContact.phone = phone;
-        }
-        return findContact;
+    const data = await fs.readFile(dbFolder);
+    const parsed = await JSON.parse(data);
+    let contact;
+    const contacts = await parsed.map((el) => {
+      if (el.id === id) {
+        contact = el;
+        if (name) contact.name = name;
+        if (email) contact.email = email;
+        if (phone) contact.phone = phone;
+        return contact;
       }
-      return elem;
+      return el;
     });
-    const contactsString = await JSON.stringify(updatedContacts, null, 2);
-    await fs.writeFile(pathContacts, contactsString);
-    return findContact;
+    const json = await JSON.stringify(contacts, null, 2);
+    await fs.writeFile(dbFolder, json);
+    return contact;
   } catch (e) {
     return e;
   }

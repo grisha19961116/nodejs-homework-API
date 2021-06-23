@@ -7,70 +7,60 @@ const {
   removeContact,
   updateContact,
 } = require("../../model/index");
-const { createContact, updateUpdate } = require("./validationContacts");
+const validation = require("../../validation");
 const { v4: uuidv4 } = require("uuid");
 
-router.get("/", async (req, res, next) => {
+router.get("/", async (_req, res, next) => {
   try {
-    const allContacts = await listContacts();
-    res.status(200).json({ message: allContacts });
+    const contacts = await listContacts();
+    res.status(200).json({ message: contacts });
   } catch (e) {
     next(e);
   }
 });
 
-router.get("/:contactId", async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const contactFoundById = await getContactById(contactId);
-    if (contactFoundById) {
-      res.status(200).json({ message: contactFoundById });
-    } else {
-      res.status(204).json({ message: "Not found" });
-    }
+    const { id } = req.params;
+    const contact = await getContactById(id);
+    if (contact) return res.status(200).json({ message: contact });
+    return res.status(204).json({ message: "Not found" });
   } catch (e) {
     next(e);
   }
 });
 
-router.post("/", createContact, async (req, res, next) => {
+router.post("/", validation.createContact, async (req, res, next) => {
   try {
     const { name, email, phone } = req.body;
     if (name && email && phone) {
       const id = uuidv4();
-      const newContact = { id, name, email, phone };
-      await addContact(newContact);
-      res.status(201).json({ message: newContact });
+      const contact = { id, name, email, phone };
+      await addContact(contact);
+      return res.status(201).json({ message: contact });
     }
   } catch (e) {
     next(e);
   }
 });
 
-router.delete("/:contactId", async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
-    const { contactId } = req.params;
-    const deletedContact = await removeContact(contactId);
-    if (deletedContact) {
-      return res.status(200).json({ message: "contact deleted" });
-    } else {
-      next();
-    }
+    const { id } = req.params;
+    const contact = await removeContact(id);
+    if (contact) return res.status(200).json({ message: "contact deleted" });
+    return next();
   } catch (e) {
     next(e);
   }
 });
 
-router.patch("/:contactId", updateUpdate, async (req, res, next) => {
-  const { contactId } = req.params;
+router.patch("/:id", validation.updateUpdate, async (req, res, next) => {
+  const { id } = req.params;
   try {
-    if (!req.body) {
-      return res.status(400).json({ message: "missing fields" });
-    }
-    const update = await updateContact(contactId, req.body);
-    if (update) {
-      return res.status(200).json({ message: update });
-    }
+    if (!req.body) return res.status(400).json({ message: "missing fields" });
+    const contact = await updateContact(id, req.body);
+    if (contact) return res.status(200).json({ message: contact });
   } catch (e) {
     next(e);
   }
