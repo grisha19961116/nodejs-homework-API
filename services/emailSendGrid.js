@@ -47,7 +47,7 @@ class EmailService {
           },
         },
         outro:
-          "Need help, or have questions? Just reply to this email, we'd love to help.",
+          "Need help, or have questions? Just reply to this email, we'll be glad to help you.",
       },
     };
 
@@ -64,8 +64,6 @@ class EmailService {
       subject: "Email confirmation",
       html: emailBody,
     };
-    console.log(msg);
-
     await this.#sender.send(msg);
   }
 }
