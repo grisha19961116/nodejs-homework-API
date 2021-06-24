@@ -13,8 +13,8 @@ const createUser = async ({ name, email, password }) => {
 const updateToken = async (id, token) => {
   return await User.updateOne({ _id: id }, { token });
 };
-const updateSubscrip = async (id, body) => {
-  return await User.findByIdAndUpdate({ _id: id }, { ...body }, { new: true });
+const updateName = async (id, name) => {
+  return await User.findByIdAndUpdate({ _id: id }, { name }, { new: true });
 };
 const updateAvatar = async (id, avatarUrl) => {
   return await User.updateOne({ _id: id }, { avatarUrl });
@@ -24,7 +24,7 @@ module.exports = {
   findByEmail,
   createUser,
   updateToken,
-  updateSubscrip,
+  updateName,
   updateAvatar,
   findById,
 };

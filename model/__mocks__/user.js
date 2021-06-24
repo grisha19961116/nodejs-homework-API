@@ -1,8 +1,10 @@
 const { users } = require("./data");
+
 const findByEmail = jest.fn((email) => {
   const [user] = users.filter((el) => String(el.email) === String(email));
   return user;
 });
+
 const findById = jest.fn((id) => {
   const [user] = users.filter((el) => String(el._id) === String(id));
   return user;
@@ -12,7 +14,7 @@ const createUser = jest.fn(({ name, email, password }) => {
   return {};
 });
 
-const updateSubscrip = jest.fn((id, body) => {
+const updateName = jest.fn((id, body) => {
   return {};
 });
 
@@ -28,7 +30,7 @@ module.exports = {
   findByEmail,
   createUser,
   updateToken,
-  updateSubscrip,
+  updateName,
   updateAvatar,
   findById,
 };

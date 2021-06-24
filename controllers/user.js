@@ -9,7 +9,7 @@ const SECRET_KEY = process.env.JWT_SECRET;
 
 const saveAvatarForStatic = async (req, res, next) => {
   try {
-    const id = req.user.id;
+    const userId = req.user.id;
     const DIR_IMAGES = process.env.DIR_IMAGES;
     const pathToFile = req.file.path;
     const newNameAvatar = req.file.originalname;
@@ -24,11 +24,11 @@ const saveAvatarForStatic = async (req, res, next) => {
       )
       .writeAsync(pathToFile);
 
-    await createFolderIsExist(path.join(DIR_IMAGES, id));
-    await fs.rename(pathToFile, path.join(DIR_IMAGES, id, newNameAvatar));
-    const newUrlAvatar = path.normalize(path.join(id, newNameAvatar));
-    const newUrl = `http://localhost:3000/${id}/${newNameAvatar}`;
-    await UserModel.updateAvatar(id, newUrlAvatar);
+    await createFolderIsExist(path.join(DIR_IMAGES, userId));
+    await fs.rename(pathToFile, path.join(DIR_IMAGES, userId, newNameAvatar));
+    const newUrlAvatar = path.normalize(path.join(userId, newNameAvatar));
+    const newUrl = `http://localhost:3000/${userId}/${newNameAvatar}`;
+    await UserModel.updateAvatar(userId, newUrlAvatar);
     return res.status(200).json({
       status: "success",
       code: 200,
@@ -43,26 +43,19 @@ const saveAvatarForStatic = async (req, res, next) => {
 
 const createNewUser = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    const isExist = await UserModel.findByEmail(email);
-    if (isExist) {
+    const isExist = await UserModel.findByEmail(req.body.email);
+    if (isExist)
       return res.status(409).json({
         status: "error",
         code: 409,
         data: "Conflict",
         message: "Email has used already!",
       });
-    }
-    const newUser = await UserModel.createUser(req.body);
+    const { id, email, name, avatarUrl } = await UserModel.createUser(req.body);
     return res.status(201).json({
       status: "success",
       code: 201,
-      data: {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name,
-        avatar: newUser.avatar,
-      },
+      data: { id, email, name, avatarUrl },
     });
   } catch (e) {
     next(e);
@@ -74,17 +67,17 @@ const logIn = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await UserModel.findByEmail(email);
     const isValidPassword = await user.validPassword(password);
-    if (!user || !isValidPassword) {
+    if (!user || !isValidPassword)
       return res.status(401).json({
         status: "error",
         code: 401,
         data: "UNAUTHORIZED",
         message: "Invalid credentials",
       });
-    }
+
     const id = user._id;
     const payload = { id };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" });
     await UserModel.updateToken(id, token);
     return res.status(200).json({
       status: "success",
@@ -98,46 +91,53 @@ const logIn = async (req, res, next) => {
   }
 };
 
-const logout = async (req, res, next) => {
-  const id = req.user.id;
-  const user = await UserModel.findById(id);
-  if (!user) {
-    return res.status(401).json({
-      status: "error",
-      code: 401,
-      data: "UNAUTHORIZED",
-      message: "Invalid credentials",
-    });
-  }
-  await UserModel.updateToken(id, null);
-  return res.status(204).json({});
-};
-const getCurrent = async (req, res, next) => {
-  const user = req.user;
-  if (!user) {
-    return res.status(401).json({
-      status: "error",
-      code: 401,
-      data: "UNAUTHORIZED",
-      message: "Invalid credentials",
-    });
-  }
-
-  return res.status(200).json({
-    status: "success",
-    code: 200,
-    data: {
-      user,
-    },
-  });
-};
-const updateSubscription = async (req, res, next) => {
+const logOut = async (req, res, next) => {
   try {
     const id = req.user.id;
-    console.log(req.body);
-    const update = await UserModel.updateSubscrip(id, req.body);
+    const user = await UserModel.findById(id);
+    if (!user)
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        data: "UNAUTHORIZED",
+        message: "Invalid credentials",
+      });
+    await UserModel.updateToken(id, null);
+    return res.status(204).json({});
+  } catch (e) {
+    next(e);
+  }
+};
+
+const getCurrent = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (!user)
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        data: "UNAUTHORIZED",
+        message: "Invalid credentials",
+      });
+
     return res.status(200).json({
-      data: update,
+      status: "success",
+      code: 200,
+      data: {
+        user,
+      },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const updateName = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const user = await UserModel.updateName(id, req.body.name);
+    return res.status(200).json({
+      data: user,
     });
   } catch (e) {
     next(e);
@@ -148,7 +148,7 @@ module.exports = {
   saveAvatarForStatic,
   createNewUser,
   logIn,
-  logout,
+  logOut,
   getCurrent,
-  updateSubscription,
+  updateName,
 };

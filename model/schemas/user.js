@@ -6,6 +6,10 @@ mongoose.Types.ObjectId.isValid();
 
 const userSchema = new Schema(
   {
+    name: {
+      type: String,
+      default: null,
+    },
     email: {
       type: String,
       required: [true, "Email required"],
@@ -21,20 +25,11 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Set password for current user"],
     },
-    subscription: {
-      type: String,
-      enum: ["free", "pro", "premium"],
-      default: "free",
-    },
     avatarUrl: {
       type: String,
       default: function () {
         return gravatar.url(this.email, { s: "250" }, true);
       },
-    },
-    imgIdCloud: {
-      type: String,
-      default: null,
     },
     token: {
       type: String,
@@ -45,9 +40,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
+  if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(8);
   this.password = await bcrypt.hash(this.password, salt, null);
   next();

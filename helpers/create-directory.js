@@ -8,8 +8,6 @@ const isAccessible = (pathFolder) => {
 };
 
 const createFolderIsExist = async (folder) => {
-  if (!(await isAccessible(folder))) {
-    await fs.mkdir(folder);
-  }
+  if (!(await isAccessible(folder))) await fs.mkdir(folder);
 };
 module.exports = createFolderIsExist;

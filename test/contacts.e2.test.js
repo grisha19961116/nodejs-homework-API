@@ -17,28 +17,28 @@ jest.mock("../model/user.js");
 
 describe("Test for route /api/contacts", () => {
   let idNewContact;
-  describe("should handle request PUT contact by id ", () => {
-    it("should return 200 on request PUT  contact", async (done) => {
+  describe("should handle request PATCH contact by id ", () => {
+    it("should return 200 on request PATCH contact", async (done) => {
       const res = await request(app)
-        .put(`/api/contacts/${contact._id}`)
+        .patch(`/api/contacts/${contact._id}`)
         .set("Authorization", `Bearer ${token}`)
         .send({ phone: "0995688412" })
         .set("Accept", "application/json");
       expect(res.status).toEqual(200);
       done();
     });
-    it("should return 404 on request PUT  contacts by id", async (done) => {
+    it("should return 404 on request PATCH  contacts by id", async (done) => {
       const res = await request(app)
-        .put(`/api/contacts/${wrongId}`)
+        .patch(`/api/contacts/${wrongId}`)
         .set("Authorization", `Bearer ${token}`)
         .send({ name: "Grigore" });
       expect(res.status).toEqual(404);
       expect(res.body).toBeDefined();
       done();
     });
-    it("should return 403 on request on request PUT  contacts by id without token", async (done) => {
+    it("should return 403 on request on request PATCH  contacts by id without token", async (done) => {
       const res = await request(app)
-        .put(`/api/contacts/${contact._id}`)
+        .patch(`/api/contacts/${contact._id}`)
         .set("Authorization", `Bearer ${wrongToken}`)
         .send({ name: "Grigore" })
         .set("Accept", "application/json");
@@ -46,9 +46,9 @@ describe("Test for route /api/contacts", () => {
       expect(res.body).toBeDefined();
       done();
     });
-    it("should return 500 on request on request PUT  with wrong filed", async (done) => {
+    it("should return 500 on request on request PATCH  with wrong filed", async (done) => {
       const res = await request(app)
-        .put(`/api/contacts/${contact._id}`)
+        .patch(`/api/contacts/${contact._id}`)
         .set("Authorization", `Bearer ${token}`)
         .send({ WrongField: "Grigore" })
         .set("Accept", "application/json");

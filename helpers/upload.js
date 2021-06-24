@@ -16,10 +16,7 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 2000000 },
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype.includes("image")) {
-      cb(null, true);
-      return;
-    }
+    if (file.mimetype.includes("image")) return cb(null, true);
     cb(null, false);
   },
 });

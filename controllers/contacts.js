@@ -18,9 +18,10 @@ const listContacts = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   try {
+    const id = req.params.id;
     const userId = req.user.id;
-    const contact = await Contact.getById(req.params.contactId, userId);
-    if (contact) {
+    const contact = await Contact.getById(id, userId);
+    if (contact)
       return res.json({
         status: "success",
         code: 200,
@@ -28,13 +29,11 @@ const getContactById = async (req, res, next) => {
           contact,
         },
       });
-    } else {
-      return res.status(404).json({
-        status: "error",
-        code: 404,
-        data: "Not Found",
-      });
-    }
+    return res.status(404).json({
+      status: "error",
+      code: 404,
+      data: "Not Found",
+    });
   } catch (e) {
     next(e);
   }
@@ -61,8 +60,9 @@ const addContact = async (req, res, next) => {
 
 const removeContact = async (req, res, next) => {
   try {
+    const id = req.params.id;
     const userId = req.user.id;
-    const contact = await Contact.remove(req.params.contactId, userId);
+    const contact = await Contact.remove(id, userId);
     if (contact) {
       return res.json({
         status: "success",
@@ -85,12 +85,9 @@ const removeContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   try {
+    const id = req.params.id;
     const userId = req.user.id;
-    const contact = await Contact.update(
-      req.params.contactId,
-      req.body,
-      userId
-    );
+    const contact = await Contact.update(id, userId, req.body);
     if (contact) {
       return res.status(200).json({
         status: "success",

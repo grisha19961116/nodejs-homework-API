@@ -5,9 +5,7 @@ const getList = async (
   { sortBy, sortByDesc, filter, limit = "5", page = "1", sub }
 ) => {
   const options = { owner: userId };
-  if (sub) {
-    options.subscription = { $all: [sub] };
-  }
+  if (sub) options.subscription = { $all: [sub] };
   const results = await Contact.paginate(options, {
     limit,
     page,
@@ -15,9 +13,7 @@ const getList = async (
       ...(sortBy ? { [`${sortBy}`]: 1 } : {}),
       ...(sortByDesc ? { [`${sortByDesc}`]: -1 } : {}),
     },
-    select: {
-      ...(filter ? filter.split("|").join(" ") : ""),
-    },
+    select: filter ? filter.split("|").join(" ") : "",
     populate: {
       path: "owner",
       select: "email password subscription token -_id",
@@ -34,9 +30,9 @@ const getById = async (id, userId) => {
   });
   return foundContact;
 };
-const add = async (newContact) => {
-  const createdContact = await Contact.create(newContact);
-  return createdContact;
+const add = async (obj) => {
+  const contact = await Contact.create(obj);
+  return contact;
 };
 
 const remove = async (id, userId) => {
@@ -46,7 +42,7 @@ const remove = async (id, userId) => {
   });
   return removedContact;
 };
-const update = async (id, body, userId) => {
+const update = async (id, userId, body) => {
   const contact = await Contact.findByIdAndUpdate(
     { _id: id, owner: userId },
     { ...body },

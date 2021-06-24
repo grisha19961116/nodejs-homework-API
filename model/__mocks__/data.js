@@ -1,43 +1,31 @@
 const contacts = [
   {
     _id: "604cec2a45d8c632bc1fake1",
-    token: null,
     name: "FAKE-ONE",
-    email: "FAKE@mail.com",
     phone: "0915088491",
-    password: "123456",
     subscription: "free",
   },
   {
     _id: "604cec3345d8c632bc1fake2",
-    token: null,
     name: "FAKE-SECOND",
-    email: "FAKE@mail.com",
     phone: "0914088491",
-    password: "54321",
     subscription: "free",
   },
   {
     _id: "604cec3345d8c632bc1fake3",
-    token: null,
     name: "FAKE-SECOND",
-    email: "FAKE@mail.com",
     phone: "0914088491",
-    password: "54321",
     subscription: "free",
   },
 ];
 const newContact = {
   name: "newUser",
-  email: "newuser@mail.com",
   phone: "9810088491",
-  password: "123456789",
-  subscription: "premium",
+  subscription: "free",
 };
 
 const User = {
   subscription: "free",
-  imgIdCloud: null,
   token:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwNGUzMTY4YTA1ZDNkMzQzMDBjMDA0ZiIsImlhdCI6MTYxNTczNzIyNSwiZXhwIjoxNjE1NzQ0NDI1fQ.8byA4KylqGkp9j9AV1eqL1EogAA0VDxr2GbBB7YIkoA",
   _id: "604cec3345d8c632bc1fake2",

@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const controllers = require("../../controllers/user");
-const validation = require("./validation/validationUser");
-const guard = require("../../helpers/guard");
-const upload = require("../../helpers/upload");
+const controllers = require("../controllers/user");
+const validation = require("../validation/user");
+const guard = require("../helpers/guard");
+const upload = require("../helpers/upload");
 
 router
   .post("/register", validation.registration, controllers.createNewUser)
   .post("/login", validation.logIn, controllers.logIn)
-  .post("/logout", guard, controllers.logout)
-  .patch("/users", guard, controllers.updateSubscription)
+  .post("/logout", guard, controllers.logOut)
+  .patch("/users", guard, controllers.updateName)
   .patch(
     "/avatars",
     [guard, upload.single("avatar"), validation.validateUploadAvatar],
