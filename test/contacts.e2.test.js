@@ -16,7 +16,6 @@ jest.mock("../model/contact.js");
 jest.mock("../model/user.js");
 
 describe("Test for route /api/contacts", () => {
-  let idNewContact;
   describe("should handle request PUT contact by id ", () => {
     it("should return 200 on request PUT  contact", async (done) => {
       const res = await request(app)
@@ -112,7 +111,6 @@ describe("Test for route /api/contacts", () => {
         .set("Accept", "application/json");
       expect(res.status).toEqual(201);
       expect(res.body).toBeDefined();
-      idNewContact = res.body.data.contact._id;
       done();
     });
     it("should return 500 on request POST  with wrong field or fields", async (done) => {

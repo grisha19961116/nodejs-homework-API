@@ -58,7 +58,6 @@ const createNewUser = async (req, res, next) => {
     }
     const verifyToken = nanoid();
     const emailService = new EmailService(process.env.NODE_ENV);
-    console.log(process.env.NODE_ENV);
     await emailService.sendEmail(verifyToken, email, name);
     const newUser = await UserModel.createUser({
       ...req.body,
@@ -79,9 +78,10 @@ const createNewUser = async (req, res, next) => {
     next(e);
   }
 };
+
 const verify = async (req, res, next) => {
   try {
-    const token = req.params.token;
+    const token = req.params.verificationToken;
     const user = UserModel.findByVerifyToken(token);
     if (user) {
       await UserModel.UpdateVerifyToken(user.id, true, null);
@@ -147,6 +147,7 @@ const logout = async (req, res, next) => {
   await UserModel.updateToken(id, null);
   return res.status(204).json({});
 };
+
 const getCurrent = async (req, res, next) => {
   const user = req.user;
   if (!user) {
@@ -166,10 +167,10 @@ const getCurrent = async (req, res, next) => {
     },
   });
 };
+
 const updateSubscription = async (req, res, next) => {
   try {
     const id = req.user.id;
-    console.log(req.body);
     const update = await UserModel.updateSubscrip(id, req.body);
     return res.status(200).json({
       data: update,

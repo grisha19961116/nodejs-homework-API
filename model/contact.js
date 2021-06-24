@@ -15,9 +15,7 @@ const getList = async (
       ...(sortBy ? { [`${sortBy}`]: 1 } : {}),
       ...(sortByDesc ? { [`${sortByDesc}`]: -1 } : {}),
     },
-    select: {
-      ...(filter ? filter.split("|").join(" ") : ""),
-    },
+    select: filter ? filter.split("|").join(" ") : "",
     populate: {
       path: "owner",
       select: "email password subscription token -_id",
